@@ -185,18 +185,13 @@ class MySQLiConnection extends Connection implements ConnectionInterface
             if ($this->isAssoc($bindings)) {
                 $query = $this->buildSql($query, $this->prepareBindings($bindings));
             }
-
+            $conn = $this->getMySqliForSelect($useRead);
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
-            $statement = $this->prepared2($this->getMySqliForSelect($useRead)
-                ->prepare($query));
+            $result = $conn->query($query);
 
             //$this->bindValues($statement, $this->prepareBindings($bindings));
-
-            $statement->execute();
-
-            $result = $statement->get_result();
 
             if ($result) {
                 return $result->fetch_all(MYSQLI_ASSOC);
