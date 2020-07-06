@@ -306,7 +306,6 @@ class MySQLiConnection extends Connection implements ConnectionInterface
             $query = $this->buildSql($query, $this->prepareBindings($bindings));
 
             $statement = $this->getMySqli()->prepare($query);
-            dd($statement);
             //
 
             //$this->bindValues($statement, $this->prepareBindings($bindings));
