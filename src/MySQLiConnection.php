@@ -189,6 +189,33 @@ class MySQLiConnection extends Connection implements ConnectionInterface
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // row from the database table, and will either be an array or objects.
+            if (!empty($bindings)) {
+                $types = [];
+
+                foreach ($bindings as $key => $value) {
+                    if (!is_string($key)) {
+                        $type = $this->getMySqliBindType($value);
+                        if ($type === 'i') {
+                            $types[] = '%d';
+                        } elseif ($type === 'd') {
+                            $types[] = '%g';
+                        } else {
+                            $types[] = '\'%s\'';
+                        }
+                    }
+                }
+                $query = str_ireplace('?', '%s', $query);
+                $query = sprintf($query, ...$types);
+
+                $params = [];
+                foreach ($bindings as $key => $value) {
+                    if (is_string($key)) {
+                        continue;
+                    }
+                    $params[] = &$bindings[$key];
+                }
+                $query = sprintf($query, ...$params);
+            }
             $result = $conn->query($query);
 
             //$this->bindValues($statement, $this->prepareBindings($bindings));
